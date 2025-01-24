@@ -184,7 +184,7 @@ def softmax(x, online=0):
     return y
 
 import softmax1
-
+import softmax2
 
 if __name__ == '__main__':
     torch.manual_seed(0)
@@ -216,12 +216,8 @@ if __name__ == '__main__':
         getattr(torch, DEVICE.type).set_stream(stream)
         if provider == 'torch':
             ms = triton.testing.do_bench(lambda: torch.softmax(x, dim=-1))
-        #if provider == 'triton':
-        #    ms = triton.testing.do_bench(lambda: softmax(x, online=0))
         if provider == 'mine':
             ms = triton.testing.do_bench(lambda: softmax1.softmax(x))
-            #ms = triton.testing.do_bench(lambda: softmax(x, online=1))
-            #ms = triton.testing.do_bench(lambda: my_sm(x))
         gbps = lambda ms: 2 * x.numel() * x.element_size() * 1e-9 / (ms * 1e-3)
         return gbps(ms)
 
