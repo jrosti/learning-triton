@@ -52,7 +52,7 @@ def softmax(x, block_size=8192, num_warps=32):
         num_blocks,
         block_size,
         num_warps=num_warps,
-        num_stages=2,
+        num_stages=1,
     )
     return y
 
