@@ -42,7 +42,7 @@ def softmax(x, block_size=8192, num_warps=32):
     num_blocks = triton.cdiv(N, block_size)
     y = torch.empty_like(x)
     grid = (triton.next_power_of_2(M),)
-    kernel_fwd[grid](
+    k = kernel_fwd[grid](
         x,
         y,
         M,
@@ -54,12 +54,15 @@ def softmax(x, block_size=8192, num_warps=32):
         num_warps=num_warps,
         num_stages=1,
     )
+    # ptx_file = __file__.replace(".py", ".ptx")
+    # with open(ptx_file, "w") as f:
+    #     f.write(k.asm["ptx"])
     return y
 
 
 if __name__ == "__main__":
     torch.manual_seed(0)
-    x = torch.randn(1823, 34231, device="cuda")
+    x = torch.randn(1823, 32768, device="cuda")
     y_triton = softmax(x)
     y_torch = torch.softmax(x, axis=-1)
     print(y_triton.sum(dim=-1))
