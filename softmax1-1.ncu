@@ -1,0 +1,79 @@
+==PROF== Connected to process 7130 (/home/jro/.pyenv/versions/3.10.13/bin/python3.10)
+==PROF== Profiling "kernel_fwd": 0%....50%....100% - 8 passes
+tensor([1.0000, 1.0000, 1.0000,  ..., 1.0000, 1.0000, 1.0000], device='cuda:0')
+==PROF== Disconnected from process 7130
+[7130] python3.10@127.0.0.1
+  kernel_fwd (2048, 1, 1)x(1024, 1, 1), Context 1, Stream 7, Device 0, CC 8.6
+    Section: GPU Speed Of Light Throughput
+    ----------------------- ----------- ------------
+    Metric Name             Metric Unit Metric Value
+    ----------------------- ----------- ------------
+    DRAM Frequency                  Ghz         9,49
+    SM Frequency                    Ghz         1,39
+    Elapsed Cycles                cycle    1 092 827
+    Memory Throughput                 %        91,78
+    DRAM Throughput                   %        91,78
+    Duration                         us       783,84
+    L1/TEX Cache Throughput           %        20,56
+    L2 Cache Throughput               %        39,95
+    SM Active Cycles              cycle 1 071 473,11
+    Compute (SM) Throughput           %        17,58
+    ----------------------- ----------- ------------
+
+    INF   The kernel is utilizing greater than 80.0% of the available compute or memory performance of the device. To   
+          further improve performance, work will likely need to be shifted from the most utilized to another unit.      
+          Start by analyzing DRAM in the Memory Workload Analysis section.                                              
+
+    Section: Launch Statistics
+    -------------------------------- --------------- ---------------
+    Metric Name                          Metric Unit    Metric Value
+    -------------------------------- --------------- ---------------
+    Block Size                                                 1 024
+    Function Cache Configuration                     CachePreferNone
+    Grid Size                                                  2 048
+    Registers Per Thread             register/thread              38
+    Shared Memory Configuration Size           Kbyte            8,19
+    Driver Shared Memory Per Block       Kbyte/block            1,02
+    Dynamic Shared Memory Per Block       byte/block             128
+    Static Shared Memory Per Block        byte/block               0
+    # SMs                                         SM              82
+    Threads                                   thread       2 097 152
+    Uses Green Context                                             0
+    Waves Per SM                                               24,98
+    -------------------------------- --------------- ---------------
+
+    Section: Occupancy
+    ------------------------------- ----------- ------------
+    Metric Name                     Metric Unit Metric Value
+    ------------------------------- ----------- ------------
+    Block Limit SM                        block           16
+    Block Limit Registers                 block            1
+    Block Limit Shared Mem                block            7
+    Block Limit Warps                     block            1
+    Theoretical Active Warps per SM        warp           32
+    Theoretical Occupancy                     %        66,67
+    Achieved Occupancy                        %        60,35
+    Achieved Active Warps Per SM           warp        28,97
+    ------------------------------- ----------- ------------
+
+    OPT   Est. Local Speedup: 33.33%                                                                                    
+          The 8.00 theoretical warps per scheduler this kernel can issue according to its occupancy are below the       
+          hardware maximum of 12. This kernel's theoretical occupancy (66.7%) is limited by the number of required      
+          registers. This kernel's theoretical occupancy (66.7%) is limited by the number of warps within each block.   
+
+    Section: GPU and Memory Workload Distribution
+    -------------------------- ----------- ------------
+    Metric Name                Metric Unit Metric Value
+    -------------------------- ----------- ------------
+    Average DRAM Active Cycles       cycle 6 828 058,67
+    Total DRAM Elapsed Cycles        cycle   89 278 464
+    Average L1 Active Cycles         cycle 1 071 473,11
+    Total L1 Elapsed Cycles          cycle   89 574 362
+    Average L2 Active Cycles         cycle 1 064 923,77
+    Total L2 Elapsed Cycles          cycle   51 356 592
+    Average SM Active Cycles         cycle 1 071 473,11
+    Total SM Elapsed Cycles          cycle   89 574 362
+    Average SMSP Active Cycles       cycle 1 045 854,29
+    Total SMSP Elapsed Cycles        cycle  358 297 448
+    -------------------------- ----------- ------------
+
