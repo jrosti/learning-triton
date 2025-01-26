@@ -60,6 +60,74 @@ def softmax(x, block_size=8192, num_warps=32):
     return y
 
 
+@triton.jit
+def kernel_bwd(dy_ptr, y_ptr, dx_ptr, M, N, stride_xm, stride_xn, num_blocks: tl.constexpr, block_size: tl.constexpr):
+    m = tl.program_id(0)
+    if m >= M:
+        return
+    row_offset_y = y_ptr + m * stride_xm
+    row_offset_dy = dy_ptr + m * stride_xm
+    block_range = tl.arange(0, block_size)
+    for n in tl.static_range(0, num_blocks):
+        column_offset = n * stride_xn + block_range
+        mask = column_offset < N * stride_xn
+        dy = tl.load(row_offset_dy + column_offset, mask=mask)
+        y = tl.load(row_offset_y + column_offset, mask=mask)
+        dot = tl.sum(dy * y, axis=0)
+        dx = y * (dy - dot)
+        tl.store(dx_ptr + m * stride_xm + column_offset, dx, mask=mask)
+
+
+
+def softmax_bwd(dy, y, block_size=8192, num_warps=32):
+    M = y.size(0)
+    N = y.size(1)
+    dy = dy.contiguous()
+    y = y.contiguous()
+    assert y.stride(0) == dy.stride(0)
+    assert y.stride(1) == dy.stride(1)
+    if block_size > N:
+        block_size = triton.next_power_of_2(N)
+    num_blocks = triton.cdiv(N, block_size)
+    dx = torch.empty_like(y)
+    grid = (triton.next_power_of_2(M),)
+    k = kernel_bwd[grid](
+        dy,
+        y,
+        dx,
+        M,
+        N,
+        y.stride(0),
+        y.stride(1),
+        num_blocks,
+        block_size,
+        num_warps=num_warps,
+        num_stages=1,
+    )
+    # ptx_file = __file__.replace(".py", ".ptx")
+    # with open(ptx_file, "w") as f:
+    #     f.write(k.asm["ptx"])
+    return dx
+
+
+class SoftmaxFunction(torch.autograd.Function):
+    @staticmethod
+    def forward(ctx, x):
+        y = softmax(x)
+        ctx.save_for_backward(y)
+        return y
+
+    @staticmethod
+    def backward(ctx, dy):
+        y, = ctx.saved_tensors
+        dx = softmax_bwd(dy, y)
+        return dx, None, None
+
+
+def softmax_with_bw(x):
+    return SoftmaxFunction.apply(x)
+
+
 if __name__ == "__main__":
     torch.manual_seed(0)
     x = torch.randn(1823, 32768, device="cuda")
