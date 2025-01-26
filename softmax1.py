@@ -37,6 +37,7 @@ def kernel_fwd(x_ptr, y_ptr, M, N, stride_xm, stride_xn, num_blocks: tl.constexp
 def softmax(x, block_size=8192, num_warps=32):
     M = x.size(0)
     N = x.size(1)
+    x = x.contiguous()
     if block_size > N:
         block_size = triton.next_power_of_2(N)
     num_blocks = triton.cdiv(N, block_size)
