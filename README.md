@@ -2,6 +2,8 @@
 
 A January 2025 learning project on an NVIDIA RTX 3090 (Ampere). I wanted to understand how Triton code maps to GPU execution, and whether I could make row-wise softmax faster than `torch.softmax` for large rows.
 
+This is my working exploration directory, including intermediate variants, commented code and unfinished experiments. I deliberately wrote the experimental code without AI agent assistance to learn through implementation, measurement and debugging.
+
 The path:
 
 1. **Start with fusion.** The [Triton softmax tutorial](https://triton-lang.org/main/getting-started/tutorials/02-fused-softmax.html) keeps a row on-chip to avoid intermediate memory traffic. Increasing the row width runs into on-chip resource limits.
